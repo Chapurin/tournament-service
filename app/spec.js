@@ -18,10 +18,10 @@ const responsesCodes = {
 module.exports = {
 	swagger: '2.0',
 	info: {
-		title: 'Sim-Track API',
+		title: 'Tournament Service API',
 		version: '1.0.0'
 	},
-	basePath: '/api',
+	basePath: '/',
 	paths: {
 		'/fund': {
 			get: {
@@ -129,6 +129,14 @@ module.exports = {
 						in: 'body',
 					},
 				],
+				responses: responsesCodes
+			},
+		},
+
+		'/reset': {
+			get: {
+				tags: ['Reset DB'],
+				summary: 'Reset DB',
 				responses: responsesCodes
 			},
 		},

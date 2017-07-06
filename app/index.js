@@ -16,7 +16,7 @@ app.use(expressValidator());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: false}));
 
-app.get('/api/swagger/spec.js', function(req, res) {
+app.get('/swagger/spec.js', function(req, res) {
 	res.send(require('./spec.js'));
 });
 
@@ -24,9 +24,9 @@ app.get('/api/swagger/spec.js', function(req, res) {
 app.use(swagger.init(app, {
 	apiVersion: '1.0',
 	swaggerVersion: '2.0',
-	swaggerURL: '/api/swagger',
+	swaggerURL: '/swagger',
 	swaggerUI: './public/swagger/',
-	basePath: '/api/swagger',
+	basePath: '/swagger',
 }));
 
 
@@ -36,7 +36,7 @@ app.all('*', function(req, res, next){
 	next();
 });
 
-app.use('/api', routes);
+app.use('/', routes);
 app.use(errorHandler());
 
 sequelize
