@@ -6,7 +6,7 @@ const sequelize = new Sequelize(config.db.postgres.name, config.db.postgres.user
       host: config.db.postgres.host,
       dialect: config.db.postgres.dialect,
       port:    config.db.postgres.port,
-      logging: sequelizeLogger
+      logging: (process.env.NODE_ENV === 'production')? false: sequelizeLogger
     }, {
       define: {
         underscored: true

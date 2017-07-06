@@ -50,7 +50,6 @@ exports.playersJoinTournament = function(req, res, next){
 					if(Array.isArray(req.query.backerId)) {
 
 						req.query.backerId.forEach((item) => {
-							console.log(item);
 
 							backersPromisesChain = backersPromisesChain.then(() => {
 								if(playersIds.indexOf(item.trim()) === -1 ) {
@@ -73,8 +72,6 @@ exports.playersJoinTournament = function(req, res, next){
 					backersPromisesChain.then(() => {
 
 						let investPointsProportion = +(tournament.deposit / playersIds.length);
-
-						console.log(playersIds);
 
 						return sequelize.transaction(function (t) {
 

@@ -2,7 +2,7 @@ version: '2'
 services:
 
   app:
-    image: chapurin/tournamentservice:1.0.1
+    image: chapurin/tournament.service:1.0.1
     depends_on:
       - mysql
     ports:

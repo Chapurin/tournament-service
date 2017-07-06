@@ -5,7 +5,7 @@ module.exports = {
 	db: {
 		postgres: {
 			dialect: 'mysql',
-			host: process.env.DB_NAME || 'localhost',
+			host: process.env.MYSQL_HOST || 'mysql',
 			port: process.env.MYSQL_PORT || 3306,
 			name: process.env.DB_NAME || 'tournament_service',
 			username: process.env.DB_USER || 'root',
