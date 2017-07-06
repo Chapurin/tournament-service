@@ -2,20 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f7062c97-8c3d-4848-822b-bd102d911170" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.env" afterPath="$PROJECT_DIR$/.env" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/configs/index.js" afterPath="$PROJECT_DIR$/app/configs/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/PlayerController.js" afterPath="$PROJECT_DIR$/app/controllers/PlayerController.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/ResetDbController.js" afterPath="$PROJECT_DIR$/app/controllers/ResetDbController.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/TournamentController.js" afterPath="$PROJECT_DIR$/app/controllers/TournamentController.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/index.js" afterPath="$PROJECT_DIR$/app/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/Invest.js" afterPath="$PROJECT_DIR$/app/models/Invest.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/Player.js" afterPath="$PROJECT_DIR$/app/models/Player.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/Tournament.js" afterPath="$PROJECT_DIR$/app/models/Tournament.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/index.js" afterPath="$PROJECT_DIR$/app/models/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/process.json" afterPath="$PROJECT_DIR$/app/process.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/spec.js" afterPath="$PROJECT_DIR$/app/spec.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docker-compose.yml" afterPath="$PROJECT_DIR$/docker-compose.yml" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -86,7 +73,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/controllers/AuthController.js" />
         <option value="$PROJECT_DIR$/components/Auth.js" />
         <option value="$PROJECT_DIR$/models/ProjectUsers.js" />
         <option value="$PROJECT_DIR$/models/Portfolio.js" />
@@ -137,6 +123,7 @@
         <option value="$PROJECT_DIR$/app/models/Tournament.js" />
         <option value="$PROJECT_DIR$/app/models/index.js" />
         <option value="$PROJECT_DIR$/app/models/Invest.js" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -291,12 +278,12 @@
       <workItem from="1499218321793" duration="6106000" />
       <workItem from="1499246801312" duration="262000" />
       <workItem from="1499247158922" duration="6000" />
-      <workItem from="1499247618447" duration="41647000" />
+      <workItem from="1499247618447" duration="41772000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="446018000" />
+    <option name="totallyTimeSpent" value="446143000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1874" height="1096" extended-state="6" />
@@ -354,13 +341,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/controllers/SprintController.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-238">
-          <caret line="4" column="37" lean-forward="false" selection-start-line="4" selection-start-column="37" selection-end-line="5" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/Sprint.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
@@ -453,14 +433,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="561">
           <caret line="48" column="0" lean-forward="true" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -725,6 +697,22 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="510">
           <caret line="30" column="45" lean-forward="false" selection-start-line="30" selection-start-column="45" selection-end-line="30" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="7" lean-forward="false" selection-start-line="0" selection-start-column="7" selection-end-line="0" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="7" />
           <folding />
         </state>
       </provider>
