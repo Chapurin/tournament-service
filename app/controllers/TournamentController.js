@@ -150,9 +150,8 @@ exports.setResultTournament = function(req, res, next){
 
 					transactionPromisesChain = transactionPromisesChain.then(() => {
 
-						if(!winnerItem.prize) return next(createError(400, 'prize need'));
-						if(!winnerItem.prize.match(/^[0-9]+$/)) return next(createError(400, 'prize must be number'));
-						if(+winnerItem.prize <= 0 ) return next(createError(400, 'prize cant be zero or below'));
+						if(!winnerItem.prize) { t.rollback(); return next(createError(400, 'prize need'));}
+						if(+winnerItem.prize <= 0 ) {t.rollback(); return next(createError(400, 'prize cant be zero or below'));}
 
 						if(winnerItem.playerId) {
 							return models.Player
@@ -164,32 +163,33 @@ exports.setResultTournament = function(req, res, next){
 									return models.Invest
 										.findOne({where: {playerId: player.playerId, leaderId: player.playerId, tournamentId: tournament.tournamentId}})
 										.then((invest) => {
+											if(invest) {
+												return models.Invest
+													.findAll({where: {leaderId: invest.leaderId, tournamentId: tournament.tournamentId}})
+													.then((winners) => {
+														proportionPrize = +winnerItem.prize / winners.length;
+														let promises = [];
+														winners.forEach((winner) => {
+															promises.push(models.Player
+																.update({points: sequelize.literal('points +' + proportionPrize)}, {where:{playerId: winner.playerId}, transaction:t})
+																.catch((err) => {
+																	t.rollback();
+																	return next(createError(err));
+																}));
 
-											return models.Invest
-												.findAll({where: {leaderId: invest.leaderId, tournamentId: tournament.tournamentId}})
-												.then((winners) => {
-													proportionPrize = +winnerItem.prize / winners.length;
-													let promises = [];
-													winners.forEach((winner) => {
-														promises.push(models.Player
-															.update({points: sequelize.literal('points +' + proportionPrize)}, {where:{playerId: winner.playerId}, transaction:t})
+														});
+														return Promise.all(promises)
 															.catch((err) => {
 																t.rollback();
 																return next(createError(err));
-															}));
+															});
 
+													})
+													.catch((err) => {
+														t.rollback();
+														return next(createError(err));
 													});
-													return Promise.all(promises)
-														.catch((err) => {
-															t.rollback();
-															return next(createError(err));
-														});
-
-												})
-												.catch((err) => {
-													t.rollback();
-													return next(createError(err));
-												});
+											}
 
 										})
 										.catch((err) => {
