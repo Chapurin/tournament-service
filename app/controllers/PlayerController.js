@@ -4,6 +4,7 @@ const models = require('../models');
 exports.fund = function(req, res, next){
 	if(!req.query.playerId) return next(createError(400, 'playerId need'));
 	if(!req.query.points) return next(createError(400, 'points need'));
+	if(!req.query.points.match(/^[0-9]+$/)) return next(createError(400, 'points must be number'));
 	if(+req.query.points <= 0 ) return next(createError(400, 'points cant be zero or below'));
 
 	models.Player
@@ -20,6 +21,7 @@ exports.fund = function(req, res, next){
 exports.takePoints = function(req, res, next){
 	if(!req.query.playerId) return next(createError(400, 'playerId need'));
 	if(!req.query.points) return next(createError(400, 'points need'));
+	if(!req.query.points.match(/^[0-9]+$/)) return next(createError(400, 'points must be number'));
 	if(+req.query.points <= 0 ) return next(createError(400, 'points cant be zero or below'));
 
 	models.Player

@@ -5,6 +5,8 @@ const models = require('../models');
 exports.announceTournament = function(req, res, next){
 	if(!req.query.tournamentId) return next(createError(400, 'tournamentId need'));
 	if(!req.query.deposit) return next(createError(400, 'deposit need'));
+	if(!req.query.deposit.match(/^[0-9]+$/)) return next(createError(400, 'deposit must be number'));
+	if(+req.query.deposit <= 0 ) return next(createError(400, 'deposit cant be zero or below'));
 
 	models.Tournament
 		.findOrCreate({where: {tournamentId: req.query.tournamentId.trim(), deposit: req.query.deposit}})
@@ -149,6 +151,8 @@ exports.setResultTournament = function(req, res, next){
 					transactionPromisesChain = transactionPromisesChain.then(() => {
 
 						if(!winnerItem.prize) return next(createError(400, 'prize need'));
+						if(!winnerItem.prize.match(/^[0-9]+$/)) return next(createError(400, 'prize must be number'));
+						if(+winnerItem.prize <= 0 ) return next(createError(400, 'prize cant be zero or below'));
 
 						if(winnerItem.playerId) {
 							return models.Player
