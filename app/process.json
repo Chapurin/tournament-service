@@ -1,0 +1,13 @@
+{
+  "apps": [{
+    "name": "TournamentService",
+    "script": "./index.js",
+    "env_production": {
+      "DB_NAME": "tournament_service",
+      "DB_USER": "root",
+      "DB_PASS": "123",
+      "PORT": "3000",
+      "MYSQL_HOST": "mysql"
+    }
+  }]
+}
