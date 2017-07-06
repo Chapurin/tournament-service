@@ -7,23 +7,20 @@ const Models  = [
 	models.Invest,
 ];
 
-
 exports.reset = function(req, res, next){
 
-	(() => {
-		let chain = Promise.resolve();
-		Models.forEach(function(Model) {
-			chain = chain
-				.then(() => Model.sync({force: true}))
-		});
+	let chain = Promise.resolve();
+	Models.forEach(function(Model) {
+		chain = chain
+			.then(() => Model.sync({force: true}))
+	});
 
-		chain
-			.then(() => {
-				res.end();
-			})
-			.catch((err) => {
-				next(createError(err));
-			});
-	})();
+	chain
+		.then(() => {
+			res.end();
+		})
+		.catch((err) => {
+			next(createError(err));
+		});
 
 };

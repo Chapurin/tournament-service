@@ -3,6 +3,8 @@ const sequelize = require('../orm');
 const models = require('../models');
 
 exports.announceTournament = function(req, res, next){
+	if(!req.query.tournamentId) return next(createError(400, 'tournamentId need'));
+	if(!req.query.deposit) return next(createError(400, 'deposit need'));
 
 	models.Tournament
 		.findOrCreate({where: {tournamentId: req.query.tournamentId.trim(), deposit: req.query.deposit}})
@@ -39,8 +41,6 @@ exports.playersJoinTournament = function(req, res, next){
 
 					playersModels.push(leader);
 					playersIds.push(leader.playerId);
-
-					console.log(req.query.backerId);
 
 					if(req.query.backerId && !Array.isArray(req.query.backerId)) {
 						req.query.backerId = [req.query.backerId];
@@ -119,11 +119,11 @@ exports.playersJoinTournament = function(req, res, next){
 
 		})
 		.catch((err) => next(createError(err)));
+
 };
 
 
 exports.setResultTournament = function(req, res, next){
-
 	if(!req.body.tournamentId) return next(createError(400, 'tournamentId need'));
 	if(!req.body.winners) return next(createError(400, 'winners need'));
 	if(!Array.isArray(req.body.winners)) return next(createError(400, 'winners must be array'));
