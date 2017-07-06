@@ -24,7 +24,13 @@ module.exports = function(sequelize, DataTypes) {
 		updatedAt: false,
 		underscored: true,
 		tableName: 'invest',
-		freezeTableName: true
+		freezeTableName: true,
+		indexes: [
+			{
+				unique: false,
+				fields: ['tournament_id', 'player_id']
+			},
+		]
 	});
 
 	Invest.removeAttribute('id');

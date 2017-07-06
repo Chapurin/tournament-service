@@ -1,7 +1,7 @@
+const createError = require('http-errors');
 const models = require('../models/index');
 
 const Models  = [
-	models.Points,
 	models.Player,
 	models.Tournament,
 	models.Invest,

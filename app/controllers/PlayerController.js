@@ -41,6 +41,8 @@ exports.takePoints = function(req, res, next){
 
 
 exports.getBalance = function(req, res, next){
+	//
+
 	models.Player
 		.findOne({where: {playerId: req.query.playerId.trim()}})
 		.then((model) => {

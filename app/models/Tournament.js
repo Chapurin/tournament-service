@@ -30,14 +30,5 @@ module.exports = function(sequelize, DataTypes) {
 		]
 	});
 
-	Tournament.associate = function(models) {
-
-		// Player.hasMany(models.Points, {foreignKey: {
-		// 	name: 'playerId',
-		// 	field: 'player_id'
-		// }});
-
-	};
-
 	return Tournament;
 };

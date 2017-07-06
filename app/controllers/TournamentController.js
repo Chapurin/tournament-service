@@ -55,8 +55,6 @@ exports.playersJoinTournament = function(req, res, next){
 							backersPromisesChain = backersPromisesChain.then(() => {
 								if(playersIds.indexOf(item.trim()) === -1 ) {
 
-									console.log(123);
-
 									return models.Player
 										.findOne({where: {playerId: item.trim()}})
 										.then((backer) => {
@@ -74,7 +72,7 @@ exports.playersJoinTournament = function(req, res, next){
 
 					backersPromisesChain.then(() => {
 
-						let investPointsProportion = +(tournament.deposit / playersIds.length);//).toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
+						let investPointsProportion = +(tournament.deposit / playersIds.length);
 
 						console.log(playersIds);
 

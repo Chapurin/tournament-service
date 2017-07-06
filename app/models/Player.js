@@ -24,14 +24,5 @@ module.exports = function(sequelize, DataTypes) {
 		]
 	});
 
-	Player.associate = function(models) {
-
-		// Player.hasMany(models.Points, {foreignKey: {
-		// 	name: 'playerId',
-		// 	field: 'player_id'
-		// }});
-
-	};
-
 	return Player;
 };
