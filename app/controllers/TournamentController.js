@@ -24,8 +24,8 @@ exports.playersJoinTournament = function(req, res, next){
 	if(!req.query.tournamentId) return next(createError(400, 'tournamentId need'));
 	if(!req.query.playerId) return next(createError(400, 'playerId need'));
 
-	let playersModels = [];
-	let playersIds = [];
+	const playersModels = [];
+	const playersIds = [];
 	let backersPromisesChain = Promise.resolve();
 	let transactionPromisesChain = Promise.resolve();
 
@@ -73,7 +73,7 @@ exports.playersJoinTournament = function(req, res, next){
 
 					backersPromisesChain.then(() => {
 
-						let investPointsProportion = +(tournament.deposit / playersIds.length);
+						const investPointsProportion = +(tournament.deposit / playersIds.length);
 
 						return sequelize.transaction(function (t) {
 
@@ -127,9 +127,7 @@ exports.setResultTournament = function(req, res, next){
 	if(!req.body.winners) return next(createError(400, 'winners need'));
 	if(!Array.isArray(req.body.winners)) return next(createError(400, 'winners must be array'));
 
-	let playersModels = [];
-	let playersIds = [];
-	let proportionPrize  = 0;
+	let proportionPrize = 0;
 	let transactionPromisesChain = Promise.resolve();
 
 
@@ -144,8 +142,6 @@ exports.setResultTournament = function(req, res, next){
 
 				// winners list
 				req.body.winners.forEach((winnerItem) => {
-					playersModels = [];
-					playersIds = [];
 
 
 					transactionPromisesChain = transactionPromisesChain.then(() => {
@@ -168,7 +164,7 @@ exports.setResultTournament = function(req, res, next){
 													.findAll({where: {leaderId: invest.leaderId, tournamentId: tournament.tournamentId}})
 													.then((winners) => {
 														proportionPrize = +winnerItem.prize / winners.length;
-														let promises = [];
+														const promises = [];
 														winners.forEach((winner) => {
 															promises.push(models.Player
 																.update({points: sequelize.literal('points +' + proportionPrize)}, {where:{playerId: winner.playerId}, transaction:t})

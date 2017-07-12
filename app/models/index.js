@@ -3,7 +3,7 @@ const path      = require("path");
 const Sequelize = require("sequelize");
 const sequelize = require('../orm');
 
-let db = {};
+const db = {};
 
 fs
 	.readdirSync(__dirname)

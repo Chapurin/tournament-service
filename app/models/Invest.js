@@ -1,6 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
 
-	let Invest = sequelize.define("Invest", {
+	const Invest = sequelize.define("Invest", {
 		tournamentId: {
 			field: 'tournament_id',
 			type: DataTypes.STRING(20),
