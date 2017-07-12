@@ -5,11 +5,11 @@ module.exports = {
 	db: {
 		postgres: {
 			dialect: 'mysql',
+			port: 3306,
 			host: process.env.MYSQL_HOST || 'mysql',
-			port: process.env.MYSQL_PORT || 3306,
 			name: process.env.DB_NAME || 'tournament_service',
 			username: process.env.DB_USER || 'root',
-			password: process.env.DB_PASS || '123'
+			password: process.env.DB_PASS || '123456'
 		}
 	},
 };
