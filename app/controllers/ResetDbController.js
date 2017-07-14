@@ -25,26 +25,26 @@ exports.reset = function(req, res, next){
 																	OR Tables_in_${config.db.postgres.name} LIKE 'invest' 
 																	OR Tables_in_${config.db.postgres.name} LIKE 'tournaments'`, {transaction: t})
 				.then((tables)=>{
-					if(tables[0].length === 3) return sequelize.query('LOCK TABLES players WRITE, invest WRITE, tournaments WRITE', {transaction: t})
+					// If tables exist
+					if(tables[0].length === 3) {
+						return Promise.resolve()
+							.then(()=>sequelize.query('LOCK TABLES players WRITE, invest WRITE, tournaments WRITE', {transaction: t}))
+							.then(()=>Promise.all([
+								sequelize.query('TRUNCATE TABLE `players`', {transaction: t}),
+								sequelize.query('TRUNCATE TABLE `invest`', {transaction: t}),
+								sequelize.query('TRUNCATE TABLE `tournaments`', {transaction: t}),
+							]))
+							.then(()=>sequelize.query('UNLOCK TABLES', {transaction: t}));
+					}
+					// If tables no exist
+					let chainSync = Promise.resolve();
+					Models.forEach(function(Model) {
+						chainSync = chainSync
+							.then(() => Model.sync({force: false, transaction: t}))
+					});
+					return chainSync;
+
 				})
-		});
-
-		chain = chain.then(() => {
-			return Promise.all([
-				sequelize.query('DROP TABLE IF EXISTS `players`', {transaction: t}),
-				sequelize.query('DROP TABLE IF EXISTS `invest`', {transaction: t}),
-				sequelize.query('DROP TABLE IF EXISTS `tournaments`', {transaction: t}),
-			]);
-
-		});
-
-		chain = chain.then(() => {
-			return sequelize.query('UNLOCK TABLES', {transaction: t})
-		});
-
-		Models.forEach(function(Model) {
-			chain = chain
-				.then(() => Model.sync({force: false, transaction: t}))
 		});
 
 		chain = chain.then(() => {
@@ -52,7 +52,6 @@ exports.reset = function(req, res, next){
 		});
 
 		return chain;
-
 	})
 		.then(() => {res.end()})
 		.catch((err) => next(createError(err)));
