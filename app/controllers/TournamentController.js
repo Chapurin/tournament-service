@@ -30,7 +30,7 @@ exports.playersJoinTournament = function(req, res, next){
 
 	return sequelize.transaction(function (t) {
 		return models.Tournament
-			.findOne({where: {tournamentId: req.query.tournamentId.trim()}, transaction: t, lock: 'SHARE'})
+			.findOne({where: {tournamentId: req.query.tournamentId.trim()}, transaction: t, lock: 'UPDATE'})
 			.then((tournament) => {
 				if (!tournament) throw createError(404, 'Tournament not found');
 				if (tournament.status === 'closed') throw createError(400, 'Tournament closed');
