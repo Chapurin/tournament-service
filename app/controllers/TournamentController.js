@@ -169,13 +169,8 @@ exports.setResultTournament = function(req, res, next){
 						if(!tournament) throw createError(404, 'Tournament not found');
 						if(tournament.status === 'closed') throw createError(400, 'Tournament closed');
 
-						console.log(req.body.winners);
-
 						req.body.winners.forEach((winnerItem) => {
 							transactionPromisesChain = transactionPromisesChain.then(() => {
-
-								console.log(winnerItem.prize);
-
 
 								if(!winnerItem.prize) throw createError(400, 'prize need');
 								if(!winnerItem.prize.toString().match(/^[0-9]+$/)) throw createError(400, 'prize must be number');
