@@ -28,7 +28,7 @@ module.exports = function () {
 			if (status < 400) status = 500;
 			res.statusCode = status;
 
-			let body = {
+			const body = {
 				status: status
 			};
 

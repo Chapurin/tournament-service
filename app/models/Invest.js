@@ -1,6 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
 
-	let Invest = sequelize.define("Invest", {
+	const Invest = sequelize.define("Invest", {
 		tournamentId: {
 			field: 'tournament_id',
 			type: DataTypes.STRING(20),
@@ -34,6 +34,35 @@ module.exports = function(sequelize, DataTypes) {
 	});
 
 	Invest.removeAttribute('id');
+
+	Invest.associate = function(models) {
+
+		Invest.belongsTo(models.Player, {
+			as: 'player',
+			foreignKey: {
+				name: 'playerId',
+				field: 'player_id'
+			}
+		});
+
+		Invest.belongsTo(models.Player, {
+			as: 'leader',
+			foreignKey: {
+				name: 'leaderId',
+				field: 'leader_id'
+			}
+		});
+
+		Invest.belongsTo(models.Tournament, {
+			as: 'tournament',
+			foreignKey: {
+				name: 'tournamentId',
+				field: 'tournament_id'
+			}
+		});
+
+
+	};
 
 	return Invest;
 };

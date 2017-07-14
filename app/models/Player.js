@@ -1,6 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
 
-	let Player = sequelize.define("Player", {
+	const Player = sequelize.define("Player", {
 		playerId: {
 			field: 'player_id',
 			type: DataTypes.STRING(20),

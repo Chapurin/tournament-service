@@ -20,104 +20,99 @@ exports.announceTournament = function(req, res, next){
 
 
 exports.playersJoinTournament = function(req, res, next){
-
 	if(!req.query.tournamentId) return next(createError(400, 'tournamentId need'));
 	if(!req.query.playerId) return next(createError(400, 'playerId need'));
 
-	let playersModels = [];
-	let playersIds = [];
+	const playersModels = [];
+	const playersIds = [];
 	let backersPromisesChain = Promise.resolve();
 	let transactionPromisesChain = Promise.resolve();
 
-	return models.Tournament
-		.findOne({where: {tournamentId: req.query.tournamentId.trim()}})
-		.then((tournament) => {
-			if(!tournament) return next(createError(404, 'Tournament not found'));
-			if(tournament.status === 'closed') return next(createError(400, 'Tournament closed'));
+	return sequelize.transaction(function (t) {
+		return models.Tournament
+			.findOne({where: {tournamentId: req.query.tournamentId.trim()}, transaction: t, lock: 'SHARE'})
+			.then((tournament) => {
+				if (!tournament) throw createError(404, 'Tournament not found');
+				if (tournament.status === 'closed') throw createError(400, 'Tournament closed');
+
+				const leaderId = req.query.playerId;
+				let backersId = req.query.backerId;
+				let allPlayes = [];
 
 
-			return models.Player
-			  .findOne({where: {playerId: req.query.playerId.trim()}})
-				.then((leader) => {
-					if(!leader) return next(createError(404, 'Player not found'));
+				// get all players
+				if(backersId && !Array.isArray(backersId)) backersId = [backersId];
+				if(!backersId) backersId = [];
+				allPlayes = backersId;
+				allPlayes.push(leaderId);
+				allPlayes.map((el)=>el.trim());
 
-					playersModels.push(leader);
-					playersIds.push(leader.playerId);
+				//lock all players
+				return models.Player.findAll({
+					attributes: [sequelize.literal('1')],
+					where: {
+						playerId: {
+							$in: allPlayes
+						}
+					},
+					transaction: t,
+					lock: 'UPDATE'
+				})
+					.then(()=>{
 
-					if(req.query.backerId && !Array.isArray(req.query.backerId)) {
-						req.query.backerId = [req.query.backerId];
-					}
+						return models.Player
+							.findOne({where: {playerId: req.query.playerId.trim()}, attributes: ['playerId'], transaction: t, lock: 'UPDATE'})
+							.then((leader) => {
+								if(!leader) throw createError(404, 'Player not found');
 
+								playersModels.push(leader);
+								playersIds.push(leader.playerId);
 
-					if(Array.isArray(req.query.backerId)) {
-
-						req.query.backerId.forEach((item) => {
-
-							backersPromisesChain = backersPromisesChain.then(() => {
-								if(playersIds.indexOf(item.trim()) === -1 ) {
-
-									return models.Player
-										.findOne({where: {playerId: item.trim()}})
-										.then((backer) => {
-											if(!backer) return next(createError(404, 'Backer ' + item + ' not found'));
-											playersModels.push(backer);
-											playersIds.push(backer.playerId);
-										})
-										.catch((err) => next(createError(err)));
-								}
-							});
-
-						});
-
-					}
-
-					backersPromisesChain.then(() => {
-
-						let investPointsProportion = +(tournament.deposit / playersIds.length);
-
-						return sequelize.transaction(function (t) {
-
-							playersModels.forEach((playerItem) => {
-								transactionPromisesChain = transactionPromisesChain.then(() => {
-									return playerItem
-										.updateAttributes({points: playerItem.points - investPointsProportion}, {transaction:t})
-										.then((model) => {
-
-											if(model.points < 0) {
-												t.rollback();
-												return next(createError(400, 'Player ' + model.playerId + ' not enough points '));
-											}
-
-											return models.Invest
-												.create({tournamentId: tournament.tournamentId, playerId: playerItem.playerId, leaderId: playersIds[0]}, {transaction:t})
-												.catch((err) => {
-													t.rollback();
-													return next(createError(err));
+								backersId.forEach((item) => {
+									backersPromisesChain = backersPromisesChain.then(() => {
+										if(playersIds.indexOf(item.trim()) === -1 ) {
+											return models.Player
+												.findOne({where: {playerId: item.trim()}, transaction: t, lock: 'UPDATE'})
+												.then((backer) => {
+													if(!backer) throw createError(404, 'Backer ' + item + ' not found');
+													playersModels.push(backer);
+													playersIds.push(backer.playerId);
 												});
+										}
+									});
+								});
 
+								backersPromisesChain = backersPromisesChain.then(() => {
+									const investPointsProportion = +tournament.deposit / playersIds.length;
+
+									playersModels.forEach((playerItem) => {
+										transactionPromisesChain = transactionPromisesChain.then(() => {
+											return playerItem
+												.updateAttributes({points: sequelize.literal('points -' + investPointsProportion)}, {transaction: t})
+												.then((model) => {
+													if(model.points < 0)  throw createError(400, 'Player ' + model.playerId + ' not enough points ');
+
+													return models.Invest
+														.create({tournamentId: tournament.tournamentId, playerId: playerItem.playerId, leaderId: playersIds[0]}, {transaction: t})
+												});
 										})
-										.catch((err) => {
-											t.rollback();
-											return next(createError(err));
-										});
-								})
-							});
-							return transactionPromisesChain;
+									});
 
-						})
-							.then(() => {
-								res.end();
-							})
-							.catch((err) => {
-								next(createError(err));
+									return transactionPromisesChain;
+								});
+
+								return backersPromisesChain;
 							});
 
-					})
-
-				});
-
-		})
-		.catch((err) => next(createError(err)));
+					});
+			})
+			.then(() => {
+				res.end();
+			});
+	})
+		.catch((err) => {
+			next(createError(err));
+		});
 
 };
 
@@ -127,104 +122,112 @@ exports.setResultTournament = function(req, res, next){
 	if(!req.body.winners) return next(createError(400, 'winners need'));
 	if(!Array.isArray(req.body.winners)) return next(createError(400, 'winners must be array'));
 
-	let playersModels = [];
-	let playersIds = [];
-	let proportionPrize  = 0;
 	let transactionPromisesChain = Promise.resolve();
+	let winnersAll = [];
 
+	req.body.winners.forEach((winnerItem) => {
+		winnersAll.push(winnerItem.playerId.trim());
+	});
 
-	return models.Tournament
-		.findOne({where: {tournamentId: req.body.tournamentId.trim()}})
-		.then((tournament) => {
-			if(!tournament) return next(createError(404, 'Tournament not found'));
-			if(tournament.status === 'closed') return next(createError(400, 'Tournament closed'));
+	return sequelize.transaction(function(t) {
 
+		return models.Invest
+			.findOne({
+				attributes: [sequelize.literal('1')],
+				where:{
+					tournamentId: req.body.tournamentId.trim(),
+					leaderId: {
+						$in: winnersAll
+					},
+				},
+				include: [
+					{
+						as: 'player',
+						model: models.Player,
+						attributes: []
+					},
+					{
+						as: 'leader',
+						model: models.Player,
+						attributes: []
+					},
+					{
+						as: 'tournament',
+						model: models.Tournament,
+						attributes: []
+					},
+				],
+				transaction: t,
+				lock: 'UPDATE'
+			})
+			.then(() => {
 
-			return sequelize.transaction(function (t) {
+				// find Tournament
+				return models.Tournament
+					.findOne({where: {tournamentId: req.body.tournamentId.trim()}, transaction: t})
+					.then((tournament) => {
+						if(!tournament) throw createError(404, 'Tournament not found');
+						if(tournament.status === 'closed') throw createError(400, 'Tournament closed');
 
-				// winners list
-				req.body.winners.forEach((winnerItem) => {
-					playersModels = [];
-					playersIds = [];
+						req.body.winners.forEach((winnerItem) => {
+							transactionPromisesChain = transactionPromisesChain.then(() => {
 
+								if(!winnerItem.prize) throw createError(400, 'prize need');
+								if(!winnerItem.prize.toString().match(/^[0-9]+$/)) throw createError(400, 'prize must be number');
+								if(+winnerItem.prize <= 0 ) throw createError(400, 'prize cant be zero or below');
 
-					transactionPromisesChain = transactionPromisesChain.then(() => {
+								// find winner
+								return models.Player
+									.findOne({where: {playerId: winnerItem.playerId.trim()}, transaction: t})
+									.then((player) => {
+										if(!player) throw createError(404, 'Player ' + winnerItem.playerId.trim() + ' not found');
 
-						if(!winnerItem.prize) {t.rollback(); return next(createError(400, 'prize need'));}
-						if(+winnerItem.prize <= 0 ) {t.rollback(); return next(createError(400, 'prize cant be zero or below'));}
+										// find winner invest
+										return models.Invest
+											.findOne({where: {playerId: player.playerId, leaderId: player.playerId, tournamentId: tournament.tournamentId}, transaction: t})
+											.then((invest) => {
+												if(!invest) throw createError(404, 'Invest for Player ' + player.playerId + ' not found');
 
-						if(winnerItem.playerId) {
-							return models.Player
-								.findOne({where: {playerId: winnerItem.playerId.trim()}})
-								.then((player) => {
-									if(!player) {t.rollback(); return next(createError(404, 'Player ' + winnerItem.playerId.trim() + ' not found'));}
-
-
-									return models.Invest
-										.findOne({where: {playerId: player.playerId, leaderId: player.playerId, tournamentId: tournament.tournamentId}})
-										.then((invest) => {
-											if(invest) {
+												// find winner team
 												return models.Invest
-													.findAll({where: {leaderId: invest.leaderId, tournamentId: tournament.tournamentId}})
+													.findAll({where: {leaderId: invest.leaderId, tournamentId: tournament.tournamentId}, transaction: t})
 													.then((winners) => {
-														proportionPrize = +winnerItem.prize / winners.length;
-														let promises = [];
+														if(!invest) throw createError(404, 'Invest for Player ' + invest.leaderId + ' not found');
+
+														const proportionPrize = +winnerItem.prize / winners.length;
+														const promises = [];
+
+														// save new balance
 														winners.forEach((winner) => {
-															promises.push(models.Player
-																.update({points: sequelize.literal('points +' + proportionPrize)}, {where:{playerId: winner.playerId}, transaction:t})
-																.catch((err) => {
-																	t.rollback();
-																	return next(createError(err));
-																}));
-
+															promises.push(
+																models.Player
+																	.update({points: sequelize.literal('points +' + proportionPrize)}, {where:{playerId: winner.playerId}, transaction: t})
+															);
 														});
+
 														return Promise.all(promises)
-															.catch((err) => {
-																t.rollback();
-																return next(createError(err));
-															});
-
-													})
-													.catch((err) => {
-														t.rollback();
-														return next(createError(err));
 													});
-											}
-
-										})
-										.catch((err) => {
-											t.rollback();
-											return next(createError(err));
-										});
-
-								})
-								.catch((err) => {
-									t.rollback();
-									return next(createError(err));
-								});
-
-						}
-
-					});
-
-
-				});
-
-				transactionPromisesChain = transactionPromisesChain.then(() => {
-
-					return tournament.updateAttributes({status: 'closed'},{transaction:t})
-						.catch((err) => {
-							t.rollback();
-							return next(createError(err));
+											});
+									})
+							});
 						});
 
-				});
-				return transactionPromisesChain;
-			})
-				.then(() => {
-					res.end();
-				});
+						// close tournament
+						transactionPromisesChain = transactionPromisesChain.then(() => {
+							return tournament.updateAttributes({status: 'closed'},{ transaction: t} )
+						});
 
+						return transactionPromisesChain;
+					})
+					.then(() => {
+						res.end();
+					});
+			});
+
+
+	})
+		.catch((err) => {
+			next(createError(err));
 		});
 
 };

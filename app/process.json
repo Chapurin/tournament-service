@@ -3,12 +3,6 @@
     "name": "TournamentService",
     "script": "./index.js",
     "env_production": {
-      "DB_NAME": "tournament_service",
-      "DB_USER": "root",
-      "DB_PASS": "123",
-      "MYSQL_PORT": "3306",
-      "PORT": "3000",
-      "MYSQL_HOST": "mysql",
       "NODE_ENV": "production"
     }
   }]
