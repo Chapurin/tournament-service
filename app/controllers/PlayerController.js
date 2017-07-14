@@ -10,7 +10,7 @@ exports.fund = function(req, res, next){
 
 	return sequelize.transaction(function (t) {
 		return models.Player
-			.findOrCreate({where: {playerId: req.query.playerId.trim()}, transaction: t})
+			.findOrCreate({where: {playerId: req.query.playerId.trim()}, transaction: t, lock: 'UPDATE'})
 			.spread((model) => {
 				return model.updateAttributes({playerId: model.playerId, points: sequelize.literal('points +' + +req.query.points)}, {transaction: t})
 					.then(() => res.end())
@@ -32,12 +32,12 @@ exports.takePoints = function(req, res, next){
 
 	return sequelize.transaction(function (t) {
 		return 	models.Player
-			.findOne({where: {playerId: req.query.playerId.trim()}})
+			.findOne({where: {playerId: req.query.playerId.trim()}, transaction: t, lock: 'UPDATE'})
 			.then((model) => {
 				if(!model) return next(createError(404, 'Player not found'));
 				if((model.points - +req.query.points) < 0)  return next(createError(400, 'The balance falls below zero'));
 
-				return model.updateAttributes({playerId: model.playerId, points: sequelize.literal('points -' + +req.query.points)})
+				return model.updateAttributes({playerId: model.playerId, points: sequelize.literal('points -' + +req.query.points)}, {transaction: t})
 					.then(() => res.end())
 			})
 			.catch((err) => {
